@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class Update {
     private String title;
@@ -33,7 +34,7 @@ public class Update {
             String res = response.toString();
             JSONObject json = new JSONObject(res);
             title = json.getString("title");
-            description = new String(json.getString("description").getBytes(), StandardCharsets.UTF_8);
+            description = new String(Base64.getDecoder().decode(json.getString("description")));
             date = json.getLong("date");
             likes = json.getInt("likes");
             this.id = id;

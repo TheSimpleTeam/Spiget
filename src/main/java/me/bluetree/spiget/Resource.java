@@ -139,7 +139,7 @@ public class Resource {
                 JSONArray json = new JSONArray(res);
                 json.forEach(item -> {
                     JSONObject data = (JSONObject) item;
-                    String message = new String(data.getString("message").getBytes(), StandardCharsets.UTF_8);
+                    String message = new String(Base64.getDecoder().decode(data.getString("message")));
                     String version = data.getString("version");
                     Long date = data.getLong("date");
                     int ID = data.getInt("id");
