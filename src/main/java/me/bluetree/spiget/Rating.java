@@ -6,13 +6,13 @@ import java.math.RoundingMode;
 
 public class Rating {
     private int count;
-    private Long average;
-    public Rating(int count , Long averge){
+    private double average;
+    public Rating(int count , double averge){
         this.count = count;
         this.average = averge;
     }
 
-    public Long getAverage() {
+    public double getAverage() {
         return average;
     }
 

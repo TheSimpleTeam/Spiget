@@ -60,7 +60,7 @@ public class Resource {
             links.add(l);
         }
         object = resoure.getJSONObject("rating");
-        rating = new Rating(object.getInt("count"),object.getLong("average"));
+        rating = new Rating(object.getInt("count"),object.getDouble("average"));
         JSONArray array = resoure.getJSONArray("testedVersions");
         testedVersions = new ArrayList<>();
         for(int i = 0; i < array.length();i++){
@@ -116,7 +116,7 @@ public class Resource {
             links.add(l);
         }
         object = resoure.getJSONObject("rating");
-        rating = new Rating(object.getInt("count"),object.getLong("average"));
+        rating = new Rating(object.getInt("count"),object.getDouble("average"));
         JSONArray array = resoure.getJSONArray("testedVersions");
         testedVersions = new ArrayList<>();
         for(int i = 0; i < array.length();i++){
