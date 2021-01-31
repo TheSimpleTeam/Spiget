@@ -2,8 +2,10 @@ plugins {
     id 'java'
 }
 
-group 'org.example'
-version '1.0'
+group = 'org.example'
+version = '1.0'
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+description = 'Spiget'
 
 repositories {
     mavenCentral()
