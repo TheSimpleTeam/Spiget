@@ -17,6 +17,7 @@ import java.util.Scanner;
 
 
 public class Resource {
+
     private boolean isVersionsLoaded = false;
     private boolean isUpdatesLoaded = false;
     private boolean isReviewsLoaded = false;
