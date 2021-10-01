@@ -1,14 +1,17 @@
 package me.bluetree.spiget.cUtils;
-import org.json.JSONObject;
+
+import com.google.gson.JsonObject;
+import me.bluetree.spiget.Resource;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
+import java.nio.charset.StandardCharsets;
 
 public class U {
-    public static JSONObject getResource(String x,int id)throws Exception{
+
+    public static JsonObject getResource(String x, int id) throws Exception{
         String url;
         if(x == null){
             url = "https://api.spiget.org/v2/resources/"+id;
@@ -18,9 +21,8 @@ public class U {
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         // optional default is GET
-        int responseCode = con.getResponseCode();
         BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
+                new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
         String inputLine;
         StringBuilder response = new StringBuilder();
         while ((inputLine = in.readLine()) != null) {
@@ -34,10 +36,10 @@ public class U {
             res = res.replaceFirst("\\[", "");
             res = res.replaceFirst("]", "");
         }
-        return new JSONObject(res);
+        return Resource.getGson().fromJson(res, JsonObject.class);
     }
 
-    public static JSONObject searchAuthor(String x)throws Exception{
+    public static JsonObject searchAuthor(String x)throws Exception{
         String url = "https://api.spiget.org/v2/search/authors/"+x;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -45,7 +47,7 @@ public class U {
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
         int responseCode = con.getResponseCode();
         BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
+                new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
         String inputLine;
         StringBuilder response = new StringBuilder();
         while ((inputLine = in.readLine()) != null) {
@@ -55,10 +57,10 @@ public class U {
         String res = response.toString();
         res = res.replaceFirst( "\\[","");
         res = res.replaceFirst( "]","");
-        return new JSONObject(res);
+        return Resource.getGson().fromJson(res, JsonObject.class);
     }
 
-    public static JSONObject getAuthor(int x) throws Exception{
+    public static JsonObject getAuthor(int x) throws Exception{
         String url = "https://api.spiget.org/v2/authors/"+x;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -66,7 +68,7 @@ public class U {
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
         int responseCode = con.getResponseCode();
         BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
+                new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
         String inputLine;
         StringBuilder response = new StringBuilder();
         while ((inputLine = in.readLine()) != null) {
@@ -76,6 +78,6 @@ public class U {
         String res = response.toString();
         res = res.replaceFirst( "\\[","");
         res = res.replaceFirst( "]","");
-        return new JSONObject(res);
+        return Resource.getGson().fromJson(res, JsonObject.class);
     }
 }

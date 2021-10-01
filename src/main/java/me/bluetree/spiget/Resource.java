@@ -1,130 +1,125 @@
 package me.bluetree.spiget;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import me.bluetree.spiget.cUtils.U;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 public class Resource {
 
+    private static final Gson gson = new GsonBuilder().create();
     private boolean isVersionsLoaded = false;
     private boolean isUpdatesLoaded = false;
     private boolean isReviewsLoaded = false;
     private List<Version> versions;
     private List<Review> reviews;
     private List<Update> updates;
-    private final JSONObject resoure;
-    private final String LatestVersion;
-    private final int resourceid;
+    private final JsonObject resource;
+    private final String latestVersion;
+    private final int resourceID;
     private final Author author;
-    private final String resourcename;
-    private final boolean permium;
+    private final String resourceName;
+    private final boolean premium;
     private final int price;
     private final int releaseDate;
     private final int downloads;
     private final int likes;
     private final String downloadLink;
     private final String resourceLink;
-    private String resourceIconLink;
+    private URL resourceIconLink;
     private final Rating rating;
     private final List<String> links;
     private final List<String> testedVersions;
-    private String description,descriptionAsXml;
-    public Resource(int resourceid) throws Exception {
-        this.resourceid = resourceid;
-        resoure = U.getResource(null,resourceid);
-        this.resourcename = resoure.getString("name");
-        permium = (Boolean) resoure.get("premium");
-        price = resoure.getInt("price");
-        releaseDate = resoure.getInt("releaseDate");
-        downloads = resoure.getInt("downloads");
-        descriptionAsXml = resoure.getString("description");
-        descriptionAsXml = new String(Base64.getDecoder().decode(descriptionAsXml));
-        description = descriptionAsXml;
-        description=description.replaceAll("<.*?>", "");
+    private String description;
+
+    public Resource(int resourceID) throws Exception {
+        this.resourceID = resourceID;
+        resource = U.getResource(null, resourceID);
+        this.resourceName = resource.get("name").getAsString();
+        premium = resource.get("premium").getAsBoolean();
+        price = resource.get("price").getAsInt();
+        releaseDate = resource.get("releaseDate").getAsInt();
+        downloads = resource.get("downloads").getAsInt();
+        description = new String(Base64.decodeBase64(resource.get("description").getAsString().getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+        description = description.replaceAll("<.*?>", "");
         description = description.replaceAll("(?m)^[ \t]*\r?\n", "");
-        likes = resoure.getInt("likes");
+        likes = resource.get("likes").getAsInt();
         links = new ArrayList<>();
-        JSONObject object = resoure.getJSONObject("links");
+        JsonObject object = resource.get("links").getAsJsonObject();
         String o = object.toString();
         String[] x = o.split(",");
         links.addAll(Arrays.asList(x));
-        object = resoure.getJSONObject("rating");
-        rating = new Rating(object.getInt("count"),object.getDouble("average"));
-        JSONArray array = resoure.getJSONArray("testedVersions");
+        object = resource.get("rating").getAsJsonObject();
+        rating = new Rating(object.get("count").getAsInt(), object.get("average").getAsInt());
+        JsonArray array = resource.get("testedVersions").getAsJsonArray();
         testedVersions = new ArrayList<>();
-        for(int i = 0; i < array.length();i++){
-            testedVersions.add(array.getString(i));
+        for(int i = 0; i < array.size(); i++){
+            testedVersions.add(array.get(i).getAsString());
         }
-        JSONObject ox = resoure.getJSONObject("file");
-        downloadLink = "https://www.spigotmc.org/"+ox.getString("url");
-        String z = resourcename;
+        JsonObject ox = resource.get("file").getAsJsonObject();
+        downloadLink = "https://www.spigotmc.org/" + ox.get("url").getAsString();
+        String z = resourceName;
         z = z.replaceAll(" - ","-");
         z = z.replaceAll(" ","-");
-        resourceLink = "https://spigotmc.org/resources/"+z+"."+ resourceid;
-        author = Author.getByResource(resourceid);
+        resourceLink = "https://spigotmc.org/resources/" + z + "." + resourceID;
+        author = Author.getByResource(resourceID);
         try (Scanner scanner = new Scanner(new URL("https://api.spigotmc.org/legacy/update.php?resource=85958").openStream())) {
-            StringBuilder argss = new StringBuilder();
+            StringBuilder args = new StringBuilder();
             while (scanner.hasNext()) {
-                argss.append(scanner.next()).append(" ");
+                args.append(scanner.next()).append(" ");
             }
-            LatestVersion = argss.toString().replaceAll("\\s+$", "");
+            latestVersion = args.toString().replaceAll("\\s+$", "");
         }
+        String iconLink = resource.get("icon").getAsJsonObject().get("url").getAsString();
+        resourceIconLink = iconLink.isEmpty() ? null : new URL("https://www.spigotmc.org/" + iconLink);
     }
-    public String getResourceIconLink() {
-        return resourceIconLink;
-    }
-    public String getTag(){
-        String i;
-        try {
-            i = resoure.getString("tag");
-            return  i;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
+
     private void loadUpdates() {
         if (!isUpdatesLoaded) {
             isUpdatesLoaded = true;
-            JSONArray jsonArray = resoure.getJSONArray("updates");
+            JsonArray jsonArray = resource.get("updates").getAsJsonArray();
             updates = new ArrayList<>();
             jsonArray.forEach(item -> {
-                JSONObject update = (JSONObject) item;
-                updates.add(new Update(resourceid, update.getInt("id")));
+                JsonObject update = (JsonObject) item;
+                updates.add(new Update(resourceID, update.get("id").getAsInt()));
             });
         }
     }
+
     private void loadVersions() {
         if (!isVersionsLoaded) {
             isVersionsLoaded = true;
-            JSONArray jsonArray = resoure.getJSONArray("versions");
+            JsonArray jsonArray = resource.get("versions").getAsJsonArray();
             versions = new ArrayList<>();
             jsonArray.forEach(item -> {
-                JSONObject version = (JSONObject) item;
-                versions.add(new Version(resourceid, version.getInt("id")));
+                JsonObject version = item.getAsJsonObject();
+                versions.add(new Version(resourceID, version.get("id").getAsInt()));
             });
         }
     }
+
     private void loadReviews() {
         if (!isReviewsLoaded) {
             isReviewsLoaded = true;
             reviews = new ArrayList<>();
             try {
-                String url = "https://api.spiget.org/v2/resources/" + resourceid + "/reviews";
+                String url = "https://api.spiget.org/v2/resources/" + resourceID + "/reviews";
                 URL obj = new URL(url);
                 HttpURLConnection con = (HttpURLConnection) obj.openConnection();
                 int responseCode = con.getResponseCode();
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
                 String inputLine;
                 StringBuilder response = new StringBuilder();
                 while ((inputLine = in.readLine()) != null) {
@@ -132,15 +127,15 @@ public class Resource {
                 }
                 in.close();
                 String res = response.toString();
-                JSONArray json = new JSONArray(res);
+                JsonArray json = gson.fromJson(res, JsonArray.class);
                 json.forEach(item -> {
-                    JSONObject data = (JSONObject) item;
-                    String message = new String(Base64.getDecoder().decode(data.getString("message"))).replace("<br> ", "");
-                    String version = data.getString("version");
-                    Long date = data.getLong("date");
-                    int ID = data.getInt("id");
-                    JSONObject rejson = data.getJSONObject("rating");
-                    Rating rating = new Rating(rejson.getInt("count"), rejson.getDouble("average"));
+                    JsonObject data = item.getAsJsonObject();
+                    String message = new String(Base64.decodeBase64(data.get("message").getAsString())).replace("<br> ", "");
+                    String version = data.get("version").getAsString();
+                    Long date = data.get("date").getAsLong();
+                    int ID = data.get("id").getAsInt();
+                    JsonObject rejson = data.get("rating").getAsJsonObject();
+                    Rating rating = new Rating(rejson.get("count").getAsInt(), rejson.get("average").getAsInt());
                     reviews.add(new Review(message, version, date, ID, rating));
                 });
             } catch (Exception ex) {
@@ -150,28 +145,32 @@ public class Resource {
         }
     }
 
+    public String getTag(){
+        return resource.get("tag").getAsString();
+    }
+
+    public URL getResourceIconLink() {
+        return resourceIconLink;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public String getResourceName(){
-        return resourcename;
+        return resourceName;
     }
 
-    public int getResourceId(){
-        return resourceid;
+    public int getResourceID(){
+        return resourceID;
     }
 
     public Author getAuthor(){
         return author;
     }
 
-    public int getResourceid() {
-        return resourceid;
-    }
-
     public boolean isPermium() {
-        return permium;
+        return premium;
     }
 
     public int getDownloads() {
@@ -209,20 +208,27 @@ public class Resource {
     public List<String> getTestedVersions() {
         return testedVersions;
     }
+
     public String getLatestVersion() {
-        return LatestVersion;
+        return latestVersion;
     }
+
     public List<Update> getUpdates() {
         loadUpdates();
         return updates;
     }
+
     public List<Review> getReviews() {
         loadReviews();
         return reviews;
     }
+
     public List<Version> getVersions() {
         loadVersions();
         return versions;
     }
 
+    public static Gson getGson() {
+        return gson;
+    }
 }
