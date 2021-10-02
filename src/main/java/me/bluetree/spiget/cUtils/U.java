@@ -75,7 +75,6 @@ public class U {
         while ((inputLine = in.readLine()) != null) {
             response.append(inputLine);
         }
-        System.out.println(response);
         in.close();
         return Resource.getGson().fromJson(response.toString(), JsonElement.class);
     }
