@@ -1,21 +1,18 @@
 package me.bluetree.spiget;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.internal.LinkedTreeMap;
 import me.bluetree.spiget.cUtils.U;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Resource {
 
@@ -28,7 +25,7 @@ public class Resource {
     private List<Update> updates;
     private final JsonObject resource;
     private final String latestVersion;
-    private final int resourceID;
+    @SerializedName("id") private final int resourceID;
     private final Author author;
     private final String resourceName;
     private final boolean premium;
@@ -38,13 +35,13 @@ public class Resource {
     private final int likes;
     private final String downloadLink;
     private final String resourceLink;
-    private URL resourceIconLink;
+    private final URL resourceIconLink;
     private final Rating rating;
     private final List<String> links;
     private final List<String> testedVersions;
     private String description;
 
-    public Resource(int resourceID) throws Exception {
+    public Resource(int resourceID) throws IOException {
         this.resourceID = resourceID;
         resource = U.getResource(null, resourceID);
         this.resourceName = resource.get("name").getAsString();
@@ -143,6 +140,20 @@ public class Resource {
             }
 
         }
+    }
+
+    /**
+     * @param name The name of the plugin
+     * @return An immutable list of resources that has the same name
+     * @throws IOException If {@link U#searchResources(String)} cannot open a stream
+     */
+    public static List<Resource> getResourcesByName(String name) throws IOException {
+        JsonArray array = gson.fromJson(U.searchResources(name), JsonArray.class);
+        List<Resource> resourceList = new ArrayList<>();
+        for (JsonElement element : array) {
+            resourceList.add(new Resource(element.getAsJsonObject().get("id").getAsInt()));
+        }
+        return Collections.unmodifiableList(resourceList);
     }
 
     public String getTag(){
