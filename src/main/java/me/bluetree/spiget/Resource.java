@@ -45,7 +45,7 @@ public class Resource {
         this.resourceID = resourceID;
         resource = U.getResource(null, resourceID);
         this.resourceName = resource.get("name").getAsString();
-        premium = resource.get("premium").getAsBoolean();
+        premium = resource.get("premium") != null && resource.get("premium").getAsBoolean();
         price = resource.get("price").getAsInt();
         releaseDate = resource.get("releaseDate").getAsInt();
         downloads = resource.get("downloads").getAsInt();

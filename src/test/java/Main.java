@@ -9,7 +9,7 @@ import java.net.URL;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        Resource r = Resource.getResourcesByName("minemobs").get(0);
+        Resource r = Resource.getResourcesByName("viaversion").get(0);
         URL imgURL = r.getResourceIconLink();
         if(imgURL == null) {
             imgURL = new URL("https://static.spigotmc.org/styles/spigot/xenresource/resource_icon.png");
