@@ -41,13 +41,24 @@ public class U {
         return Resource.getGson().fromJson(res, JsonObject.class);
     }
 
-    public static JsonObject searchAuthor(String x) throws IOException {
-        String url = "https://api.spiget.org/v2/search/authors/"+x;
+    public static JsonElement searchAuthor(String x) throws IOException {
+        return searchAuthor(x, 10);
+    }
+
+    public static JsonElement searchAuthor(String name, int size) throws IOException {
+        String url = "https://api.spiget.org/v2/search/authors/" + name + "?size=" + size;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
-        return getJsonObject(con);
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        return Resource.getGson().fromJson(response.toString(), JsonElement.class);
     }
 
     private static JsonObject getJsonObject(HttpURLConnection con) throws IOException {
