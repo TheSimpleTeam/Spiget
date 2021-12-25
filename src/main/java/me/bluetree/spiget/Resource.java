@@ -1,6 +1,6 @@
 package me.bluetree.spiget;
 
-import me.bluetree.spiget.cUtils.U;
+import me.bluetree.spiget.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -43,7 +42,7 @@ public class Resource {
     private String description,descriptionAsXml;
     public Resource(int resourceid) throws Exception {
         this.resourceid = resourceid;
-        resoure = U.getResource(null,resourceid);
+        resoure = Utils.getResource(null,resourceid);
         this.resourcename = resoure.getString("name");
         permium = (Boolean) resoure.get("premium");
         price = resoure.getInt("price");
@@ -76,7 +75,7 @@ public class Resource {
         z = z.replaceAll(" ","-");
         resourceLink = "https://spigotmc.org/resources/"+z+"."+ resourceid;
         author = Author.getByResource(resourceid);
-        try (Scanner scanner = new Scanner(new URL("https://api.spigotmc.org/legacy/update.php?resource=85958").openStream())) {
+        try (Scanner scanner = new Scanner(new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceid).openStream())) {
             String argss = "";
             while (scanner.hasNext()) {
                 argss = argss + scanner.next() + " ";

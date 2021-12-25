@@ -1,7 +1,7 @@
 package me.bluetree.spiget;
 
 
-import me.bluetree.spiget.cUtils.U;
+import me.bluetree.spiget.utils.Utils;
 import org.json.JSONObject;
 
 public class Author {
@@ -12,14 +12,14 @@ public class Author {
     private int id;
     private Author(int resourceid,int r) throws Exception{
         this.resourceid = resourceid;
-        xAuthor = U.getResource("author",resourceid);
+        xAuthor = Utils.getResource("author",resourceid);
         Name = xAuthor.getString("name");
         id = xAuthor.getInt("id");
         JSONObject form_data = xAuthor.getJSONObject("icon");
         icon = "https://spigotmc.org/" + form_data.getString("url");
     }
     private Author (int id) throws Exception{
-        xAuthor = U.getAuthor(id);
+        xAuthor = Utils.getAuthor(id);
         Name = xAuthor.getString("name");
         id = xAuthor.getInt("id");
         JSONObject form_data = xAuthor.getJSONObject("icon");
@@ -27,11 +27,11 @@ public class Author {
     }
 
     public static Author getByName(String name)throws Exception{
-        return new Author( U.getAuthor(U.searchAuthor(name).getInt("id")).getInt("id"));
+        return new Author( Utils.getAuthor(Utils.searchAuthor(name).getInt("id")).getInt("id"));
     }
 
     public static Author getById(int id)throws Exception{
-        return new Author( U.getAuthor(id).getInt("id"));
+        return new Author( Utils.getAuthor(id).getInt("id"));
     }
 
     public static Author getByResource(int id)throws Exception{

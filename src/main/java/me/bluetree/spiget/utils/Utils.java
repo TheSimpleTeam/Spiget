@@ -1,4 +1,4 @@
-package me.bluetree.spiget.cUtils;
+package me.bluetree.spiget.utils;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -7,7 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class U {
+public class Utils {
     public static JSONObject getResource(String x,int id)throws Exception{
         String url;
         if(x == null){
