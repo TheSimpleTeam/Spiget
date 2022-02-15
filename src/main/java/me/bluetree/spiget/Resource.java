@@ -72,7 +72,7 @@ public class Resource {
         z = z.replaceAll(" ","-");
         resourceLink = "https://spigotmc.org/resources/" + z + "." + resourceID;
         author = Author.getByResource(resourceID);
-        try (Scanner scanner = new Scanner(new URL("https://api.spigotmc.org/legacy/update.php?resource=85958").openStream())) {
+        try (Scanner scanner = new Scanner(new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceID).openStream())) {
             StringBuilder args = new StringBuilder();
             while (scanner.hasNext()) {
                 args.append(scanner.next()).append(" ");
